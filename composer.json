@@ -1,0 +1,19 @@
+{
+  "name": "mightybattle/game-queue",
+  "require": {
+    "symfony/var-dumper": "^5.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "MightyBattle\\GameQueue\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "test/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.2"
+  }
+}
