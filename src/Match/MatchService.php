@@ -9,10 +9,12 @@ use MightyBattle\GameQueue\Entity\WaitingPlayerInterface;
 use MightyBattle\GameQueue\Util\ArrayUtil;
 use MightyBattle\GameQueue\Util\NumberUtil;
 use MightyBattle\GameQueue\Util\TypedList;
+use Psr\Log\LoggerInterface;
 
 class MatchService
 {
     private CacheInterface $cache;
+    private LoggerInterface $logger;
     /**
      * @var History[]
      */
@@ -30,9 +32,10 @@ class MatchService
     private string $cardsCountCacheKey = 'cards_count_history';
     private string $levelCacheKey = 'level_history';
 
-    public function __construct(CacheInterface $cache)
+    public function __construct(CacheInterface $cache, LoggerInterface $logger)
     {
         $this->cache = $cache;
+        $this->logger = $logger;
     }
 
     /**
@@ -130,8 +133,11 @@ class MatchService
 
         $players->filter(fn($p) => $p !== $first, true);
         if ($matchingPlayer != null) {
+            $this->logger->debug('Chance for ' . $first->id() . ' with ' . $matchingPlayer->id());
             $players->filter(fn($p) => $p !== $matchingPlayer, true);
             $matches->add(new Match($first, $matchingPlayer));
+        } else {
+            $this->logger->debug('No Chances For ' . $first->id());
         }
     }
 
@@ -143,7 +149,9 @@ class MatchService
         $chances = new TypedList(MatchChance::class);
         /** @var WaitingPlayerInterface $waitingPlayer */
         foreach ($waitingPlayers->values() as $waitingPlayer) {
-            $chances->add($this->calculateChance($playerToMatch, $waitingPlayer));
+            $chance = $this->calculateChance($playerToMatch, $waitingPlayer);
+            $this->logger->debug('calculated chance for ' . $playerToMatch->id() . ' against ' . $waitingPlayer->id() . ' is ' . ((int) ($chance->chance() * 100)) . '%');
+            $chances->add($chance);
         }
 
         $closestChance = $this->findClosestChance($chances);
@@ -313,7 +321,7 @@ class MatchService
             $sum = ($levelItem->getWon() + $levelItem->getLost());
 
             // if there was only one such game, cant say anything about chances
-            if ($sum === 1) {
+            if ($sum < 10) {
                 return 0.5;
             }
 
@@ -375,7 +383,7 @@ class MatchService
             fn(History $historyItem): bool => NumberUtil::checkDiff($lowCards, $historyItem->getLowValue(), 5) && NumberUtil::checkDiff($highCards, $historyItem->getHighValue(), 5)
         );
 
-        if (count($cardsCountItems) === 1) {
+        if (count($cardsCountItems) < 10) {
             return 0.5;
         }
 
@@ -419,7 +427,7 @@ class MatchService
             fn(History $historyItem): bool => NumberUtil::checkDiff($lowPoints, $historyItem->getLowValue(), 150) && NumberUtil::checkDiff($highPoints, $historyItem->getHighValue(), 150)
         );
 
-        if (count($deckPointsItems) === 1) {
+        if (count($deckPointsItems) < 10) {
             return 0.5;
         }
 

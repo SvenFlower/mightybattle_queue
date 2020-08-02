@@ -1,7 +1,8 @@
 {
   "name": "mightybattle/game-queue",
   "require": {
-    "symfony/var-dumper": "^5.1"
+    "symfony/var-dumper": "^5.1",
+    "psr/log": "^1.1"
   },
   "autoload": {
     "psr-4": {
