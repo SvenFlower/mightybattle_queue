@@ -155,6 +155,11 @@ class MatchService
         }
 
         $closestChance = $this->findClosestChance($chances);
+
+        if ($closestChance === null) {
+            return null;
+        }
+
         return $closestChance->getWaitingPlayer();
     }
 
@@ -459,9 +464,8 @@ class MatchService
 
     /**
      * @param TypedList<MatchChance> $chances
-     * @return MatchChance
      */
-    private function findClosestChance(TypedList $chances): MatchChance
+    private function findClosestChance(TypedList $chances): ?MatchChance
     {
         /** @var MatchChance $chanceItem */
         $chanceItem = $chances->first();
@@ -472,22 +476,21 @@ class MatchService
             $compChance = $chanceComp->chance();
 
             if ($compChance === 0.5) {
-                $chance = $compChance;
                 $chanceItem = $chanceComp;
                 break;
             }
 
-            if ($compChance > $chance && $compChance < 0.5) {
-                $chance = $compChance;
-                $chanceItem = $chanceComp;
-                break;
-            }
+            $distanceCompChance = abs(0.5 - $compChance);
+            $distancePrevChance = abs(0.5 - $chance);
 
-            if ($compChance < $chance && $compChance > 0.5) {
-                $chance = $compChance;
+            if ($distanceCompChance < $distancePrevChance) {
                 $chanceItem = $chanceComp;
-                break;
+                $chance = $compChance;
             }
+        }
+
+        if ($chanceItem->chance() < 0.4 || $chanceItem->chance() > 0.6) {
+            return null;
         }
 
         return $chanceItem;
