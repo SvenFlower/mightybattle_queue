@@ -4,7 +4,7 @@ namespace MightyBattle\GameQueue\Match;
 
 use MightyBattle\GameQueue\Entity\PlayerInterface;
 
-class Match
+class QueueMatch
 {
     private PlayerInterface $player;
     private PlayerInterface $player2;

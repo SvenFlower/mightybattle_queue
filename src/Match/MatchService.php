@@ -40,13 +40,13 @@ class MatchService
 
     /**
      * @param TypedList<WaitingPlayerInterface> $playersArg
-     * @return TypedList<Match>
+     * @return TypedList<QueueMatch>
      */
     public function match(TypedList $playersArg): TypedList
     {
         $players = $playersArg->duplicate();
         $this->init();
-        $list = new TypedList(Match::class);
+        $list = new TypedList(QueueMatch::class);
 
         $prevSize = $players->size();
         do {
@@ -107,7 +107,7 @@ class MatchService
 
     /**
      * @param TypedList<WaitingPlayerInterface> $players
-     * @param TypedList<Match> $matches
+     * @param TypedList<QueueMatch> $matches
      */
     private function lookUpMatches(TypedList $players, TypedList $matches): void
     {
@@ -135,7 +135,7 @@ class MatchService
         if ($matchingPlayer != null) {
             $this->logger->debug('Chance for ' . $first->id() . ' with ' . $matchingPlayer->id());
             $players->filter(fn($p) => $p !== $matchingPlayer, true);
-            $matches->add(new Match($first, $matchingPlayer));
+            $matches->add(new QueueMatch($first, $matchingPlayer));
         } else {
             $this->logger->debug('No Chances For ' . $first->id());
         }

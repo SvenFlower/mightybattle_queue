@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Match;
 
 use MightyBattle\GameQueue\Entity\PlayerInterface;
-use MightyBattle\GameQueue\Match\Match;
+use MightyBattle\GameQueue\Match\QueueMatch;
 use MightyBattle\GameQueue\Match\MatchService;
 use MightyBattle\GameQueue\Util\Clock;
 use MightyBattle\GameQueue\Util\TypedList;
@@ -49,9 +49,9 @@ class MatchServiceTest extends TestCase
 
         $this->assertSame(2, $matches->size());
 
-        /** @var Match $match */
+        /** @var QueueMatch $match */
         $match = $matches->first();
-        /** @var Match $lastMatch */
+        /** @var QueueMatch $lastMatch */
         $lastMatch = $matches->last();
 
         $this->assertSame('1', $match->player()->id());
@@ -91,7 +91,7 @@ class MatchServiceTest extends TestCase
 
         $this->assertSame(1, $matches->size());
 
-        /** @var Match $match */
+        /** @var QueueMatch $match */
         $match = $matches->first();
 
         $this->assertSame('2', $match->player()->id());
@@ -122,7 +122,7 @@ class MatchServiceTest extends TestCase
 
         $this->assertSame(1, $matches->size());
 
-        /** @var Match $match */
+        /** @var QueueMatch $match */
         $match = $matches->first();
 
         $this->assertSame('2', $match->player()->id());
